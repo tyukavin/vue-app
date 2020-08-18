@@ -2,30 +2,72 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Vue App Users</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
 <body>
 	<div id="app">
-		<div v-for="item in info">
-			{{ item.firstName }}
+		<users-table v-bind:info="info"></users-table>
+	</div>
+
+	<div id="table" hidden>
+		<div>
+			<div v-for="(item, index) in info">
+				{{index}} — {{ item.firstName }}
+			</div>
+			
+			<hr>
 		</div>
 	</div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-	new Vue({
+	
+	var users = {
+		template: "#table",
+		props: {
+			info: {
+				type: Array,
+				required: true
+			}
+		},
+		data: function() {
+			return {
+				localTest: 123
+			}
+		},
+		computed: {
+			// ...
+		},
+		methods: {
+			removeItem: function(item) {
+				this.$emit('remove', item.title);
+			}
+		}
+	}
+
+	var vueApp = new Vue({
 	  el: '#app',
+	  components: {
+	  	'users-table': users
+	  },
 	  data: function() {
 	    return {
-	      info: null
+	      info: []
 	    };
 	  },
 	  mounted: function() {
 	    axios
 	      .get('http://localhost:3000/posts')
 	      .then(response => (this.info = response.data));
+	  },
+	  watch: {
+	  	info: function(val) {
+	  		console.log("Данные загружены " + val.length);
+	  	}
 	  }
 	});
+
 </script>
 </html>
